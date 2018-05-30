@@ -56,6 +56,8 @@ type Interval interface {
 	// Encompass returns an interval that covers the exact extents of two
 	// intervals.
 	Encompass(Interval) Interval
+
+	Obj(Interval) Interval
 }
 
 // Set is a set of interval objects used for
@@ -478,4 +480,119 @@ func setIntervalIterator(s SetInput, extent Interval) (iter func() Interval, can
 	return intervalMapperToIterator(func(f IntervalReceiver) {
 		s.IntervalsBetween(extent, f)
 	})
+}
+
+type span struct {
+	id  string
+	min int
+	max int
+}
+
+// case returns a *span from an Interval interface, or it panics.
+func cast(i Interval) *span {
+	x, ok := i.(*span)
+	if !ok {
+		panic(fmt.Errorf("interval must be an span: %v", i))
+	}
+	return x
+}
+
+// zero returns the zero value for span.
+func zero() *span {
+	return &span{}
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func (s *span) String() string {
+	return fmt.Sprintf("%s [%d, %d)", s.id, s.min, s.max)
+}
+
+func (s *span) Equal(t *span) bool {
+	return s.min == t.min && s.max == t.max
+}
+
+// Intersect returns the intersection of an interval with another
+// interval. The function may panic if the other interval is incompatible.
+
+func (s *span) Intersect(tInt Interval) Interval {
+	t := cast(tInt)
+	result := &span{
+		t.id,
+		max(s.min, t.min),
+		min(s.max, t.max),
+	}
+	if result.min < result.max {
+		return result
+	}
+	return zero()
+}
+
+// Before returns true if the interval is completely before another interval.
+func (s *span) Before(tInt Interval) bool {
+	t := cast(tInt)
+	return s.max <= t.min
+}
+
+// IsZero returns true for the zero value of an interval.
+func (s *span) IsZero() bool {
+	return s.min == 0 && s.max == 0
+}
+
+// Bisect returns two intervals, one on either lower side of x and one on the
+// upper side of x, corresponding to the subtraction of x from the original
+// interval. The returned intervals are always within the range of the
+// original interval.
+func (s *span) Bisect(tInt Interval) (Interval, Interval) {
+	intersection := cast(s.Intersect(tInt))
+	if intersection.IsZero() {
+		if s.Before(tInt) {
+			return s, zero()
+		}
+		return zero(), s
+	}
+	maybeZero := func(id string, min, max int) *span {
+		if min == max {
+			return zero()
+		}
+		return &span{id, min, max}
+	}
+	return maybeZero(intersection.id, s.min, intersection.min), maybeZero(intersection.id, intersection.max, s.max)
+
+}
+
+// Adjoin returns the union of two intervals, if the intervals are exactly
+// adjacent, or the zero interval if they are not.
+func (s *span) Adjoin(tInt Interval) Interval {
+	t := cast(tInt)
+	if s.max == t.min {
+		return &span{t.id, s.min, t.max}
+	}
+	if t.max == s.min {
+		return &span{t.id, t.min, s.max}
+	}
+	return zero()
+}
+
+// Encompass returns an interval that covers the exact extents of two
+// intervals.
+func (s *span) Encompass(tInt Interval) Interval {
+	t := cast(tInt)
+	return &span{t.id, min(s.min, t.min), max(s.max, t.max)}
+}
+
+func (s *span) Obj() Interval {
+	return &span{s.id, s.min, s.max}
 }
