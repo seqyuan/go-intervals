@@ -57,7 +57,7 @@ type Interval interface {
 	// intervals.
 	Encompass(Interval) Interval
 
-	Obj(Interval) Interval
+	Obj() Interval
 }
 
 // Set is a set of interval objects used for
