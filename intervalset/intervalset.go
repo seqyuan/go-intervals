@@ -596,6 +596,6 @@ func (s *Span) Encompass(tInt Interval) Interval {
 	return &Span{t.Id, min(s.min, t.min), max(s.max, t.max)}
 }
 
-func (s *Span) Obj() Interval {
+func (s *Span) Obj() Span {
 	return &Span{s.Id, s.min, s.max}
 }
