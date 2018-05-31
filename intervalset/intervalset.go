@@ -57,10 +57,10 @@ type Interval interface {
 	// intervals.
 	Encompass(Interval) Interval
 
-	Obj() strSpan
+	Obj() StrSpan
 }
 
-type strSpan interface {
+type StrSpan interface {
 	// Intersect returns the intersection of an interval with another
 	// interval. The function may panic if the other interval is incompatible.
 	Id() string
