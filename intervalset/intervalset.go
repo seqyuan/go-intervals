@@ -66,6 +66,7 @@ type strSpan interface {
 	Id() string
 	min() int
 	max() int
+}
 
 // Set is a set of interval objects used for
 type Set struct {
@@ -488,4 +489,3 @@ func setIntervalIterator(s SetInput, extent Interval) (iter func() Interval, can
 		s.IntervalsBetween(extent, f)
 	})
 }
-
