@@ -60,6 +60,13 @@ type Interval interface {
 	Obj() Span
 }
 
+type strSpan interface {
+	// Intersect returns the intersection of an interval with another
+	// interval. The function may panic if the other interval is incompatible.
+	Id() string
+	min() int
+	max() int
+
 // Set is a set of interval objects used for
 type Set struct {
 	//non-overlapping intervals
@@ -596,6 +603,18 @@ func (s *Span) Encompass(tInt Interval) Interval {
 	return &Span{t.Id, min(s.min, t.min), max(s.max, t.max)}
 }
 
-func (s *Span) Obj() *Span {
+func (s *Span) Id() string {
+	return s.Id
+}
+
+func (s *Span) min() int {
+	return s.min
+}
+
+func (s *Span) max() int {
+	return s.max
+}
+
+func (s *Span) Obj() strSpan {
 	return &Span{s.Id, s.min, s.max}
 }
