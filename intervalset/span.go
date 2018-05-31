@@ -1,3 +1,9 @@
+package intervalset
+
+import (
+	"fmt"
+)
+
 type Span struct {
 	Id  string
 	min int
