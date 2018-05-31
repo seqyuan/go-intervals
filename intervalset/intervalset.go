@@ -57,15 +57,9 @@ type Interval interface {
 	// intervals.
 	Encompass(Interval) Interval
 
-	Obj() StrSpan
-}
-
-type StrSpan interface {
-	// Intersect returns the intersection of an interval with another
-	// interval. The function may panic if the other interval is incompatible.
-	Id() string
-	min() int
-	max() int
+	ID() string
+	Max() int
+	Min() int
 }
 
 // Set is a set of interval objects used for
