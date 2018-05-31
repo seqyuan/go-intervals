@@ -58,8 +58,8 @@ type Interval interface {
 	Encompass(Interval) Interval
 
 	ID() string
-	Max() int
-	Min() int
+	MAX() int
+	MIN() int
 }
 
 // Set is a set of interval objects used for

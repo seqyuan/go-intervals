@@ -6,8 +6,8 @@ import (
 
 type Span struct {
 	Id  string
-	min int
-	max int
+	Min int
+	Max int
 }
 
 func cast(i Interval) *Span {
@@ -38,7 +38,7 @@ func max(a, b int) int {
 }
 
 func (s *Span) String() string {
-	return fmt.Sprintf("%s [%d, %d)", s.Id, s.min, s.max)
+	return fmt.Sprintf("%s [%d, %d)", s.Id, s.Min, s.Max)
 }
 
 func (s *Span) Id_name() string {
@@ -46,7 +46,7 @@ func (s *Span) Id_name() string {
 }
 
 func (s *Span) Equal(t *Span) bool {
-	return s.min == t.min && s.max == t.max
+	return s.Min == t.Min && s.Max == t.Max
 }
 
 // Intersect returns the intersection of an interval with another
@@ -56,10 +56,10 @@ func (s *Span) Intersect(tInt Interval) Interval {
 	t := cast(tInt)
 	result := &Span{
 		t.Id,
-		max(s.min, t.min),
-		min(s.max, t.max),
+		max(s.Min, t.Min),
+		min(s.Max, t.Max),
 	}
-	if result.min < result.max {
+	if result.Min < result.Max {
 		return result
 	}
 	return zero()
@@ -68,12 +68,12 @@ func (s *Span) Intersect(tInt Interval) Interval {
 // Before returns true if the interval is completely before another interval.
 func (s *Span) Before(tInt Interval) bool {
 	t := cast(tInt)
-	return s.max <= t.min
+	return s.Max <= t.Min
 }
 
 // IsZero returns true for the zero value of an interval.
 func (s *Span) IsZero() bool {
-	return s.min == 0 && s.max == 0
+	return s.Min == 0 && s.Max == 0
 }
 
 // Bisect returns two intervals, one on either lower side of x and one on the
@@ -88,13 +88,13 @@ func (s *Span) Bisect(tInt Interval) (Interval, Interval) {
 		}
 		return zero(), s
 	}
-	maybeZero := func(Id string, min, max int) *Span {
-		if min == max {
+	maybeZero := func(Id string, Min, Max int) *Span {
+		if Min == Max {
 			return zero()
 		}
-		return &Span{Id, min, max}
+		return &Span{Id, Min, Max}
 	}
-	return maybeZero(intersection.Id, s.min, intersection.min), maybeZero(intersection.Id, intersection.max, s.max)
+	return maybeZero(intersection.Id, s.Min, intersection.Min), maybeZero(intersection.Id, intersection.Max, s.Max)
 
 }
 
@@ -102,11 +102,11 @@ func (s *Span) Bisect(tInt Interval) (Interval, Interval) {
 // adjacent, or the zero interval if they are not.
 func (s *Span) Adjoin(tInt Interval) Interval {
 	t := cast(tInt)
-	if s.max == t.min {
-		return &Span{t.Id, s.min, t.max}
+	if s.Max == t.Min {
+		return &Span{t.Id, s.Min, t.Max}
 	}
-	if t.max == s.min {
-		return &Span{t.Id, t.min, s.max}
+	if t.Max == s.Min {
+		return &Span{t.Id, t.Min, s.Max}
 	}
 	return zero()
 }
@@ -115,17 +115,17 @@ func (s *Span) Adjoin(tInt Interval) Interval {
 // intervals.
 func (s *Span) Encompass(tInt Interval) Interval {
 	t := cast(tInt)
-	return &Span{t.Id, min(s.min, t.min), max(s.max, t.max)}
+	return &Span{t.Id, min(s.Min, t.Min), max(s.Max, t.Max)}
 }
 
 func (s *Span) ID() string {
 	return s.Id
 }
 
-func (s *Span) Min() int {
-	return s.min
+func (s *Span) MIN() int {
+	return s.Min
 }
 
-func (s *Span) Max() int {
-	return s.max
+func (s *Span) MAX() int {
+	return s.Max
 }
