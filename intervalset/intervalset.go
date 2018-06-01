@@ -161,6 +161,10 @@ func adjoinOrAppend(intervals []Interval, x Interval) []Interval {
 	return intervals
 }
 
+func aAppend(intervals []Interval, x Interval) []Interval {
+	return append(intervals, x)
+}
+
 func (s *Set) Insert(insertion Interval) {
 	if s.Contains(insertion) {
 		return
@@ -171,6 +175,49 @@ func (s *Set) Insert(insertion Interval) {
 	var newIntervals []Interval
 	push := func(x Interval) {
 		newIntervals = adjoinOrAppend(newIntervals, x)
+	}
+	inserted := false
+	for _, x := range s.intervals {
+		if inserted {
+			push(x)
+			continue
+		}
+		if insertion.Before(x) {
+			push(insertion)
+			push(x)
+			inserted = true
+			continue
+		}
+		// [===left===)[==x===)[===right===)
+		left, right := insertion.Bisect(x)
+		if !left.IsZero() {
+			push(left)
+		}
+		push(x)
+		// Replace the interval being inserted with the remaining portion of the
+		// interval to be inserted.
+		if right.IsZero() {
+			inserted = true
+		} else {
+			insertion = right
+		}
+	}
+	if !inserted {
+		push(insertion)
+	}
+	s.intervals = newIntervals
+}
+
+func (s *Set) DangerInsert(insertion Interval) {
+	if s.Contains(insertion) {
+		return
+	}
+	// TODO(reddaly): Something like Java's ArrayList would allow both O(log(n))
+	// insertion and O(log(n)) lookup. For now, we have O(log(n)) lookup and O(n)
+	// insertion.
+	var newIntervals []Interval
+	push := func(x Interval) {
+		newIntervals = aAppend(newIntervals, x)
 	}
 	inserted := false
 	for _, x := range s.intervals {
