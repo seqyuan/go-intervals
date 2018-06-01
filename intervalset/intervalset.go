@@ -126,7 +126,7 @@ func (s *Set) Extent() Interval {
 func (s *Set) Add(b SetInput) {
 	// Loop through the intervals of x
 	b.IntervalsBetween(b.Extent(), func(x Interval) bool {
-		s.insert(x)
+		s.Insert(x)
 		return true
 	})
 }
@@ -161,7 +161,7 @@ func adjoinOrAppend(intervals []Interval, x Interval) []Interval {
 	return intervals
 }
 
-func (s *Set) insert(insertion Interval) {
+func (s *Set) Insert(insertion Interval) {
 	if s.Contains(insertion) {
 		return
 	}
