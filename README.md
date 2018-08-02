@@ -4,6 +4,83 @@ go-intervals is a library for performing set operations on 1-dimensional
 intervals, such as time ranges.
 
 Example usage:
+```
+package main
+
+import (
+    "fmt"
+    . "github.com/seqyuan/go-intervals/intervalset"
+)
+
+func aaa() string {
+    var a string
+    //a = "qwe"
+    return a
+}
+
+func main() {
+
+    frag1 := &Span{
+        "f1",
+        1,
+        5,
+    }
+    frag2 := &Span{
+        "f2",
+        6,
+        10,
+    }
+    frag3 := &Span{
+        "f3",
+        10,
+        15,
+    }
+
+    frag4 := &Span{
+        "f4",
+        9,
+        11,
+    }
+    frag5 := &Span{
+        "f5",
+        15,
+        16,
+    }
+    y := []Interval{frag1, frag2, frag3}
+
+    x := NewSet(y)
+    fmt.Println(x)
+
+    //y := NewSet([]Interval{frag2})
+    x.DangerInsert(frag5)
+    fmt.Println(x)
+    fmt.Println(frag5)
+    /*
+        //x.Add(y)
+        a := NewSet([]Interval{frag4})
+
+        fmt.Println(x)
+        a.Intersect(x)
+
+        fmt.Println("xxxx1", x)
+        fmt.Println("xxxx2", a.String())
+
+        fmt.Println("ttt", len(a.AllIntervals()))
+        for _, qw := range a.AllIntervals() {
+            fmt.Println(qw)
+            fmt.Println(qw.MAX())
+        }
+    */
+    a := NewSet([]Interval{frag4})
+    a.Intersect(x)
+    fmt.Println(len(a.AllIntervals()))
+    fmt.Println(a.AllIntervals()[0].MAX())
+
+    aaa := aaa()
+    fmt.Println(aaa)
+}
+
+```
 
 ```
 func load_restriction_fragment(in_file string, minfragsize int, maxfragsize int, verbose bool)map[string]*Set {
